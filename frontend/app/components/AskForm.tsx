@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Loader2, MessageCircle, BookOpen, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Loader2, MessageCircle, BookOpen, Clock, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
@@ -24,12 +24,46 @@ interface QuestionResponse {
   confidence?: number;
 }
 
+interface QuestionAnswerPair {
+  question: string;
+  answer: string;
+  timestamp: string;
+}
+
 const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<QuestionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [topK, setTopK] = useState(3);
+  const [previousQuestions, setPreviousQuestions] = useState<string[]>([]);
+  const [questionAnswerHistory, setQuestionAnswerHistory] = useState<QuestionAnswerPair[]>([]);
+  // Load previous questions from localStorage on mount (handle SSR)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('previousQuestions');
+      if (stored) {
+        setPreviousQuestions(JSON.parse(stored));
+      }
+      const storedHistory = localStorage.getItem('questionAnswerHistory');
+      if (storedHistory) {
+        setQuestionAnswerHistory(JSON.parse(storedHistory));
+      }
+    }
+  }, []);
+  // Save previous questions to localStorage whenever they change (skip initial empty array)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && previousQuestions.length > 0) {
+      localStorage.setItem('previousQuestions', JSON.stringify(previousQuestions));
+    }
+  }, [previousQuestions]);
+
+  // Save question-answer history to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && questionAnswerHistory.length > 0) {
+      localStorage.setItem('questionAnswerHistory', JSON.stringify(questionAnswerHistory));
+    }
+  }, [questionAnswerHistory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +74,12 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
     setResponse(null);
     onQuestionSubmit?.(question);
 
+    // Add to previous questions
+    setPreviousQuestions((prev) => {
+      const updated = [question.trim(), ...prev.filter(q => q !== question.trim())].slice(0, 10);
+      return updated;
+    });
+
     try {
       const response = await axios.post('http://localhost:8000/api/v1/ask/', {
         question: question.trim(),
@@ -47,6 +87,16 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
       });
 
       setResponse(response.data);
+      
+      // Add to question-answer history
+      setQuestionAnswerHistory((prev) => {
+        const newPair: QuestionAnswerPair = {
+          question: question.trim(),
+          answer: response.data.answer,
+          timestamp: new Date().toISOString()
+        };
+        return [newPair, ...prev.filter(pair => pair.question !== question.trim())].slice(0, 10);
+      });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Failed to get answer';
       setError(errorMessage);
@@ -59,10 +109,16 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
     if (!confidence) return 'Unknown';
     return `${Math.round(confidence)}%`;
   };
-
   const formatTimestamp = (timestamp?: string) => {
     if (!timestamp) return '';
     return new Date(timestamp).toLocaleDateString();
+  };
+
+  const deleteQuestionAnswer = (indexToDelete: number) => {
+    setQuestionAnswerHistory((prev) => {
+      const updated = prev.filter((_, index) => index !== indexToDelete);
+      return updated;
+    });
   };
 
   return (
@@ -126,9 +182,10 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
                 )}
               </button>
             </div>
-          </div>
-        </form>
-      </div>      {/* Error Display */}
+          </div>        </form>
+      </div>
+
+      {/* Error Display */}
       {error && (
         <div className="card border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
           <div className="flex items-center text-red-700 dark:text-red-400">
@@ -156,7 +213,7 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
               )}
             </div>
             
-            <div className="prose prose-gray max-w-none">
+            <div className="prose prose-gray max-w-none text-gray-900 dark:text-white">
               <ReactMarkdown>{response.answer}</ReactMarkdown>
             </div>
           </div>
@@ -199,10 +256,50 @@ const AskForm: React.FC<AskFormProps> = ({ onQuestionSubmit }) => {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            </div>          )}
         </div>
       )}
+
+      {/* Question & Answer History */}
+      <div className="card">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <BookOpen className="mr-2" size={20} />
+          Question & Answer History
+        </h3>
+        {questionAnswerHistory.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">No questions asked yet.</p>
+        ) : (
+          <div className="space-y-4">            {questionAnswerHistory.map((pair, idx) => (
+              <div key={idx} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <button
+                      className="text-left text-blue-600 dark:text-blue-300 hover:underline font-medium"
+                      onClick={() => setQuestion(pair.question)}
+                      type="button"
+                    >
+                      Q: {pair.question}
+                    </button>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                      {new Date(pair.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => deleteQuestionAnswer(idx)}
+                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1"
+                    title="Delete this question-answer pair"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                <div className="text-sm text-gray-700 dark:text-gray-300 mt-2 pl-4 border-l-2 border-gray-300 dark:border-gray-600">
+                  <ReactMarkdown>{pair.answer}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

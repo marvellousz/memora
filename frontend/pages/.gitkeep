@@ -1,0 +1,2 @@
+# This file ensures the pages directory exists to prevent Next.js ENOENT errors
+# The app uses App Router (app directory) instead of Pages Router
