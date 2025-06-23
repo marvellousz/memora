@@ -1,8 +1,8 @@
-# Backend API - Personal Knowledge Base
+# Backend API - Memora
 
 FastAPI backend for the Personal Knowledge Base with semantic search capabilities.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ The API will be available at:
 - Interactive docs: http://localhost:8000/docs
 - Alternative docs: http://localhost:8000/redoc
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Document Management
 - `POST /api/v1/upload/` - Upload PDF or text documents
@@ -78,7 +78,7 @@ The API will be available at:
 - `GET /` - Basic health check
 - `GET /health` - Detailed health check
 
-## 🛠️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -98,7 +98,7 @@ The system uses these models by default:
 - **Embeddings**: `all-MiniLM-L6-v2` (384 dimensions)
 - **LLM**: Any GGUF model placed in `models/` directory
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 backend/
@@ -137,7 +137,7 @@ curl -X POST "http://localhost:8000/api/v1/ask/" \
      -d '{"question": "What is this document about?", "top_k": 5}'
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -164,7 +164,7 @@ Check logs for detailed error information:
 tail -f app.log
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Docker (Optional)
 

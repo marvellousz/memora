@@ -1,8 +1,8 @@
-# Frontend - Personal Knowledge Base
+# Frontend - Memora
 
 Next.js frontend for the Personal Knowledge Base with semantic search capabilities.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -44,7 +44,7 @@ npm run build
 npm start
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### Tech Stack
 
@@ -72,7 +72,7 @@ frontend/
 └── public/            # Static assets
 ```
 
-## 📱 Features
+## Features
 
 ### Upload Documents
 - **File Upload**: Drag & drop PDF or text files
@@ -92,7 +92,7 @@ frontend/
 - **Embedding Progress**: Track which documents have been processed
 - **Batch Operations**: Generate embeddings for all documents at once
 
-## 🎨 UI Components
+## UI Components
 
 ### Custom Components
 
@@ -130,7 +130,7 @@ The app uses a custom design system built on Tailwind CSS:
 .card          /* White container with shadow */
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### API Configuration
 
@@ -155,7 +155,7 @@ Create a `.env.local` file for environment-specific settings:
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 🎯 Usage
+## Usage
 
 ### 1. Upload Documents
 
@@ -177,7 +177,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 3. Adjust the number of chunks if needed
 4. Click "Ask" and wait for the response
 
-## 🔍 API Integration
+## API Integration
 
 The frontend communicates with the FastAPI backend through these endpoints:
 
@@ -207,7 +207,7 @@ The app includes comprehensive error handling:
 - **Validation**: Client-side input validation
 - **Loading States**: Visual feedback during operations
 
-## 🚀 Deployment
+## Deployment
 
 ### Vercel (Recommended)
 
@@ -241,7 +241,7 @@ CMD ["npm", "start"]
 NEXT_PUBLIC_API_URL=https://your-backend-api.com
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -267,7 +267,7 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.com
 - Use React DevTools for component debugging
 - Enable verbose logging with `DEBUG=* npm run dev`
 
-## 📈 Performance
+## Performance
 
 ### Optimization
 
