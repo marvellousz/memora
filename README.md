@@ -1,4 +1,4 @@
-# Memora - AI-Powered Personal Knowledge Base
+# memora - ai-powered personal knowledge base
 
 A full-stack application for building a personal knowledge base with semantic search and question answering capabilities using **completely free and open-source AI tools**. No OpenAI or paid APIs required!
 
