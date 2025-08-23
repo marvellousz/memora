@@ -32,7 +32,7 @@ A local, privacy-first knowledge base with semantic search and question answerin
 
 1. **Clone & Setup**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/marvellousz/memora
    cd memora
    
    # Automated setup
