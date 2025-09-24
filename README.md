@@ -1,4 +1,4 @@
-# Memora
+# memora
 
 A local, privacy-first knowledge base with semantic search and question answering using completely free and open-source AI tools.
 
