@@ -3,26 +3,28 @@ version: '3.8'
 services:
   mongodb:
     image: mongo:7.0
-    container_name: knowledge_base_mongodb
+    container_name: memora_mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     environment:
-      MONGO_INITDB_DATABASE: knowledge_base
+      MONGO_INITDB_DATABASE: memora_kb
 
   backend:
     build: ./backend
-    container_name: knowledge_base_backend
+    container_name: memora_backend
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
       - MONGODB_URL=mongodb://mongodb:27017
-      - DATABASE_NAME=knowledge_base
+      - DATABASE_NAME=memora_kb
+      - LLM_MODEL_PATH=models/mistral-7b-instruct-v0.1.Q4_K_M.gguf
       - EMBEDDING_MODEL=all-MiniLM-L6-v2
       - LOG_LEVEL=INFO
+      - FAISS_INDEX_PATH=faiss_index.pkl
     volumes:
       - ./backend/models:/app/models
       - ./backend/data:/app/data
@@ -37,7 +39,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: knowledge_base_frontend
+    container_name: memora_frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -46,7 +48,7 @@ services:
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3

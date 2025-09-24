@@ -1,5 +1,5 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+# Use Python 3.12 slim image
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
@@ -8,10 +8,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
+    cmake \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
@@ -19,6 +22,10 @@ COPY . .
 
 # Create necessary directories
 RUN mkdir -p models data logs
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 8000

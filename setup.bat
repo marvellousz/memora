@@ -100,7 +100,7 @@ python -m pip install --upgrade pip setuptools wheel
 REM Install dependencies
 echo Installing Python dependencies...
 echo This may take several minutes...
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 if errorlevel 1 (
     echo ❌ Failed to install Python dependencies
     echo Try installing Visual Studio Build Tools and rerun this script
@@ -118,7 +118,7 @@ cd frontend
 REM Install dependencies
 echo Installing Node.js dependencies...
 echo This may take several minutes...
-npm install
+npm install --no-optional
 if errorlevel 1 (
     echo ❌ Failed to install Node.js dependencies
     echo Try running: npm cache clean --force
