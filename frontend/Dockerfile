@@ -1,5 +1,5 @@
-# Use Node.js 18 alpine image
-FROM node:18-alpine
+# Use Node.js 22 alpine image
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /app
@@ -21,7 +21,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000 || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
 
 # Run the application
 CMD ["npm", "start"]

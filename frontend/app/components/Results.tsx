@@ -70,6 +70,10 @@ const Results: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const formatTimestamp = (timestamp: string) => {
@@ -197,7 +201,7 @@ const Results: React.FC = () => {
             <div className="flex items-center">
               {getStatusIcon(systemStatus.system_ready)}
               <span className={`ml-2 font-medium ${
-                systemStatus.system_ready ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                systemStatus.system_ready ? 'text-gray-600 dark:text-gray-400' : 'text-red-700 dark:text-red-400'
               }`}>
                 System is {systemStatus.system_ready ? 'Ready' : 'Not Ready'}
               </span>
@@ -252,24 +256,42 @@ const Results: React.FC = () => {
       </div>      {/* Embedding Status */}
       {embeddingStatus && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Zap className="mr-2" size={20} />
-            Embedding Status
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <Zap className="mr-2" size={20} />
+              Embedding Status
+            </h3>
+            <button
+              onClick={fetchData}
+              className="btn-secondary flex items-center text-sm"
+            >
+              <RefreshCw className="mr-1" size={14} />
+              Refresh
+            </button>
+          </div>
           
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium">Pending:</span> {embeddingStatus.pending_chunks || 0}
+                <span className="font-medium">Total Chunks:</span> {embeddingStatus.chunks?.total || 0}
               </div>
               <div>
-                <span className="font-medium">Processing:</span> {embeddingStatus.processing || false ? 'Yes' : 'No'}
+                <span className="font-medium">With Embeddings:</span> {embeddingStatus.chunks?.with_embeddings || 0}
               </div>
               <div>
-                <span className="font-medium">Last Updated:</span> {embeddingStatus.last_update ? formatTimestamp(embeddingStatus.last_update) : 'Never'}
+                <span className="font-medium">Without Embeddings:</span> {embeddingStatus.chunks?.without_embeddings || 0}
               </div>
               <div>
-                <span className="font-medium">Queue Status:</span> {embeddingStatus.queue_status || 'Unknown'}
+                <span className="font-medium">Completion:</span> {Math.round(embeddingStatus.chunks?.completion_percentage || 0)}%
+              </div>
+              <div>
+                <span className="font-medium">Model:</span> {embeddingStatus.embedding_model?.model_name || 'Unknown'}
+              </div>
+              <div>
+                <span className="font-medium">Status:</span> 
+                <span className={`ml-2 px-2 py-1 rounded text-xs ${embeddingStatus.ready ? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' : 'bg-yellow-100 text-yellow-800'}`}>
+                  {embeddingStatus.ready ? 'Ready' : 'Processing'}
+                </span>
               </div>
             </div>
           </div>
